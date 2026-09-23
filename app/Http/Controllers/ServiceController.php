@@ -13,8 +13,10 @@ class ServiceController extends Controller
     {
         return Inertia::render('services/Index', [
             'seo' => Seo::make(
-                'Servicios de seguridad privada',
-                'Guardias de seguridad intramuros, escolta, instalación de circuitos cerrados de televisión (CCTV) y cercas eléctricas y de navajas en Cuernavaca, Morelos.',
+                title: config('spp.seo.services_title'),
+                description: config('spp.seo.services_description'),
+                image: '/images/marca/og-servicios.jpg',
+                breadcrumbs: [['name' => 'Servicios', 'url' => route('services.index', absolute: false)]],
             ),
         ]);
     }
@@ -24,7 +26,16 @@ class ServiceController extends Controller
         $service = ServiceCatalog::find($slug) ?? abort(404);
 
         return Inertia::render('services/Show', [
-            'seo' => Seo::make($service['name'], $service['intro'], $service['heroImage']['src']),
+            'seo' => Seo::make(
+                title: $service['seoTitle'],
+                description: $service['seoDescription'],
+                image: $service['ogImage'],
+                breadcrumbs: [
+                    ['name' => 'Servicios', 'url' => route('services.index', absolute: false)],
+                    ['name' => $service['name'], 'url' => $service['url']],
+                ],
+                service: $service,
+            ),
             'service' => $service,
         ]);
     }

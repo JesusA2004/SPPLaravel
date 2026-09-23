@@ -2,16 +2,24 @@
 import { usePage } from '@inertiajs/vue3';
 import { FileText } from '@lucide/vue';
 import BrandIcon from '@/components/common/BrandIcon.vue';
-import SiteLink from '@/components/common/SiteLink.vue';
 import { Button } from '@/components/ui/button';
 import { resolveIcon } from '@/lib/icons';
+import { serviceWhatsappMessage, whatsappUrl } from '@/lib/whatsapp';
 import type { Service } from '@/types';
 
-defineProps<{
+const props = defineProps<{
     service: Service;
 }>();
 
+const emit = defineEmits<{
+    quote: [];
+}>();
+
 const company = usePage().props.company;
+const whatsappLink = whatsappUrl(
+    company.contact.whatsapp.number,
+    serviceWhatsappMessage(props.service.phrase),
+);
 </script>
 
 <template>
@@ -47,15 +55,13 @@ const company = usePage().props.company;
                         {{ service.intro }}
                     </p>
                     <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-                        <Button as-child size="lg">
-                            <SiteLink href="#cotizar">
-                                <FileText />
-                                Cotizar este servicio
-                            </SiteLink>
+                        <Button size="lg" @click="emit('quote')">
+                            <FileText />
+                            Cotizar este servicio
                         </Button>
                         <Button as-child size="lg" variant="outline">
                             <a
-                                :href="company.contact.whatsapp.url"
+                                :href="whatsappLink"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
@@ -69,19 +75,22 @@ const company = usePage().props.company;
                     </div>
                 </div>
 
-                <div v-reveal="120" class="relative order-1 lg:order-2">
+                <div v-reveal="120" class="group relative order-1 lg:order-2">
                     <div
                         class="absolute -inset-3 -z-10 rounded-3xl bg-gradient-to-br from-gold-500/30 via-transparent to-navy-700/20 blur-2xl"
                         aria-hidden="true"
                     />
-                    <img
-                        :src="service.heroImage.src"
-                        :alt="service.heroImage.alt"
-                        :width="service.heroImage.width"
-                        :height="service.heroImage.height"
-                        fetchpriority="high"
-                        class="aspect-[4/3] w-full rounded-2xl object-cover shadow-xl"
-                    />
+                    <div class="sheen overflow-hidden rounded-2xl shadow-xl">
+                        <img
+                            :src="service.heroImage.src"
+                            :alt="service.heroImage.alt"
+                            :width="service.heroImage.width"
+                            :height="service.heroImage.height"
+                            fetchpriority="high"
+                            decoding="async"
+                            class="aspect-[4/3] w-full object-cover transition-transform duration-700 ease-(--ease-out-soft) group-hover:scale-[1.03]"
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -90,7 +99,7 @@ const company = usePage().props.company;
                     v-for="(highlight, index) in service.highlights"
                     :key="highlight.title"
                     v-reveal="index * 100"
-                    class="group rounded-2xl border border-border bg-muted/50 p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-navy-700/20 hover:bg-white hover:shadow-md"
+                    class="group sheen rounded-2xl border border-border bg-muted/50 p-6 transition-[transform,background-color,border-color,box-shadow] hover:-translate-y-1 hover:border-gold-500/50 hover:bg-white hover:shadow-lg hover:shadow-navy-900/5"
                 >
                     <span
                         class="flex size-11 items-center justify-center rounded-lg bg-navy-900 text-gold-500 transition-colors group-hover:bg-gold-500 group-hover:text-ink-950"

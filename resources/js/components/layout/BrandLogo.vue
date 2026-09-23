@@ -13,7 +13,7 @@ const props = defineProps<{
             alt=""
             width="347"
             height="360"
-            class="h-11 w-auto shrink-0 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)] sm:h-12"
+            class="h-11 w-auto shrink-0 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)] transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-2 sm:h-12"
         />
         <span
             class="flex flex-col font-display text-[0.8rem] leading-tight font-semibold tracking-wide sm:text-sm"

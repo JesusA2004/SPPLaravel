@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
             'description' => config('spp.description'),
             'about' => config('spp.about'),
             'qualityPolicy' => config('spp.quality_policy'),
+            'authorization' => config('spp.authorization'),
             'contact' => [
                 'address' => config('spp.contact.address'),
                 'city' => config('spp.contact.city'),
@@ -52,6 +53,8 @@ class HandleInertiaRequests extends Middleware
                 'email' => config('spp.contact.email'),
                 'whatsapp' => [
                     'label' => $whatsapp['label'],
+                    'number' => $whatsapp['number'],
+                    'message' => $whatsapp['message'],
                     'url' => 'https://wa.me/'.$whatsapp['number'].'?text='.rawurlencode($whatsapp['message']),
                 ],
                 'mapsUrl' => config('spp.contact.maps_url'),

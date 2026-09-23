@@ -6,12 +6,15 @@ export type ImageAsset = {
 };
 
 export type Seo = {
-    title: string | null;
-    fullTitle: string;
+    title: string;
     description: string;
     canonical: string;
     image: string;
+    imageWidth: number;
+    imageHeight: number;
+    imageAlt: string;
     type: string;
+    robots: string;
 };
 
 export type LinkItem = {
@@ -27,12 +30,18 @@ export type Company = {
     description: string;
     about: string;
     qualityPolicy: string;
+    authorization: string;
     contact: {
         address: string;
         city: string;
         phone: { label: string; href: string };
         email: string;
-        whatsapp: { label: string; url: string };
+        whatsapp: {
+            label: string;
+            number: string;
+            message: string;
+            url: string;
+        };
         mapsUrl: string;
         mapsEmbedUrl: string;
     };
@@ -45,6 +54,7 @@ export type ServiceSummary = {
     url: string;
     name: string;
     navLabel: string;
+    phrase: string;
     summary: string;
     icon: string;
     cardImage: ImageAsset;
@@ -68,6 +78,9 @@ export type GalleryItem = ImageAsset & {
 
 export type Service = ServiceSummary & {
     title: string;
+    overview: string[];
+    audience: string[];
+    coverage: string;
     introTitle: string;
     intro: string;
     heroImage: ImageAsset;
@@ -92,3 +105,11 @@ export type Client = {
 };
 
 export type QuoteStatus = 'success' | 'error' | 'throttled' | 'expired';
+
+export type QuoteFields = {
+    nombre: string;
+    correo: string;
+    telefono: string;
+    empresa: string;
+    descripcion: string;
+};

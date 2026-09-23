@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 
@@ -40,6 +41,25 @@ class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
         );
+
+        $this->configureUrls();
+    }
+
+    /**
+     * En producción todas las URL generadas usan el dominio canónico de APP_URL,
+     * aunque la petición llegue por IP, por www o detrás de un proxy.
+     */
+    protected function configureUrls(): void
+    {
+        if (! app()->isProduction()) {
+            return;
+        }
+
+        URL::forceRootUrl(config('app.url'));
+
+        if (str_starts_with((string) config('app.url'), 'https://')) {
+            URL::forceScheme('https');
+        }
     }
 
     /**

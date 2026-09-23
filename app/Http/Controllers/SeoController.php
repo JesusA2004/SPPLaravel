@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Seo;
 use App\Support\ServiceCatalog;
 use Illuminate\Http\Response;
 
@@ -9,17 +10,17 @@ class SeoController extends Controller
 {
     public function sitemap(): Response
     {
-        $urls = [
-            ['loc' => route('home'), 'priority' => '1.0'],
-            ['loc' => route('services.index'), 'priority' => '0.9'],
-            ...array_map(
-                fn (string $slug) => ['loc' => route('services.show', $slug), 'priority' => '0.8'],
-                ServiceCatalog::slugs(),
-            ),
+        $paths = [
+            '/',
+            route('services.index', absolute: false),
+            ...array_map(fn (string $slug) => route('services.show', $slug, false), ServiceCatalog::slugs()),
         ];
 
         return response()
-            ->view('seo.sitemap', ['urls' => $urls])
+            ->view('seo.sitemap', [
+                'urls' => array_map(Seo::absoluteUrl(...), $paths),
+                'lastModified' => config('spp.seo.updated_at'),
+            ])
             ->header('Content-Type', 'application/xml; charset=UTF-8');
     }
 
@@ -29,7 +30,7 @@ class SeoController extends Controller
             'User-agent: *',
             'Allow: /',
             '',
-            'Sitemap: '.route('sitemap'),
+            'Sitemap: '.Seo::absoluteUrl('sitemap.xml'),
             '',
         ]);
 

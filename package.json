@@ -3,12 +3,13 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vp build",
-        "build:ssr": "vp build && vp build --ssr",
-        "dev": "vp dev",
-        "check": "vp check",
-        "check:fix": "vp check --fix",
-        "types:check": "vue-tsc --noEmit"
+        "dev": "vite",
+        "build": "vite build",
+        "types:check": "vue-tsc --noEmit",
+        "format": "prettier --write resources/",
+        "format:check": "prettier --check resources/",
+        "check": "npm run types:check && npm run format:check",
+        "check:fix": "npm run format"
     },
     "dependencies": {
         "@inertiajs/vite": "^3.0.0",
@@ -17,7 +18,7 @@
         "@vueuse/core": "^12.8.2",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
-        "embla-carousel-autoplay": "^8.6.0",
+        "embla-carousel-auto-scroll": "^8.6.0",
         "embla-carousel-vue": "^8.6.0",
         "laravel-vite-plugin": "^3.0.0",
         "reka-ui": "^2.10.5",
@@ -33,15 +34,14 @@
         "@vitejs/plugin-vue": "^6.0.0",
         "concurrently": "^10.0.3",
         "fontaine": "^0.8.2",
+        "prettier": "^3.9.9",
+        "prettier-plugin-tailwindcss": "^0.6.14",
         "typescript": "^5.2.2",
         "vite": "^8.0.0",
-        "vite-plus": "0.3.0",
         "vue-tsc": "^2.2.4"
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1",
-        "@rollup/rollup-linux-x64-gnu": "4.9.5",
-        "@rollup/rollup-win32-x64-msvc": "4.9.5",
         "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
         "@tailwindcss/oxide-win32-x64-msvc": "^4.0.1",
         "lightningcss-linux-x64-gnu": "^1.29.1",

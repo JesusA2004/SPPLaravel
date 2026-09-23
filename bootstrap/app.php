@@ -56,7 +56,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return Inertia::render('Error', [
                 'status' => $status,
-                'seo' => Seo::make($status === 404 ? 'Página no encontrada' : 'Error'),
+                'seo' => Seo::make(
+                    title: ($status === 404 ? 'Página no encontrada' : 'Error').' | '.config('spp.name'),
+                    description: config('spp.seo.home_description'),
+                    indexable: false,
+                ),
             ])
                 ->toResponse($request)
                 ->setStatusCode($status);

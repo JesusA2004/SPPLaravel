@@ -37,7 +37,7 @@ defineProps<{
                     v-for="(card, index) in support.cards"
                     :key="card.title"
                     v-reveal="index * 100"
-                    class="relative overflow-hidden rounded-2xl border border-border bg-white p-7 shadow-sm"
+                    class="relative overflow-hidden rounded-2xl border border-border bg-white p-7 shadow-sm transition-[transform,box-shadow,border-color] hover:-translate-y-1 hover:border-gold-500/40 hover:shadow-lg hover:shadow-navy-900/5"
                 >
                     <span
                         class="absolute inset-y-0 left-0 w-1 bg-gold-500"

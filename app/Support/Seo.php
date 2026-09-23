@@ -8,65 +8,196 @@ namespace App\Support;
  */
 class Seo
 {
-    public const HOME_TITLE = 'Servicios de Protección Profesional | SPP Seguridad Privada en Morelos';
+    private const OG_IMAGE = '/images/marca/og-image.jpg';
 
-    public const HOME_DESCRIPTION = 'Servicios de Protección Profesional (SPP), empresa de seguridad privada en Cuernavaca, Morelos, con más de 20 años de experiencia: guardias de seguridad intramuros, escoltas, instalación de CCTV y cercas eléctricas.';
+    private const OG_IMAGE_WIDTH = 1200;
+
+    private const OG_IMAGE_HEIGHT = 630;
 
     /**
-     * @return array{title: string|null, fullTitle: string, description: string, canonical: string, image: string, type: string}
+     * @param  list<array{name: string, url: string}>  $breadcrumbs  Migas después de "Inicio".
+     * @param  array<string, mixed>|null  $service  Servicio del catálogo para su esquema Service.
+     * @return array{title: string, description: string, canonical: string, image: string, imageWidth: int, imageHeight: int, imageAlt: string, type: string, robots: string, schema: array<string, mixed>}
      */
-    public static function make(?string $title = null, ?string $description = null, ?string $image = null, string $type = 'website'): array
-    {
+    public static function make(
+        string $title,
+        string $description,
+        ?string $image = null,
+        array $breadcrumbs = [],
+        ?array $service = null,
+        bool $indexable = true,
+    ): array {
+        $canonical = self::absoluteUrl(request()->path());
+
         return [
             'title' => $title,
-            'fullTitle' => $title ? "{$title} | ".config('spp.name') : self::HOME_TITLE,
-            'description' => $description ?? self::HOME_DESCRIPTION,
-            'canonical' => url()->current(),
-            'image' => url($image ?? '/images/marca/og-image.jpg'),
-            'type' => $type,
+            'description' => $description,
+            'canonical' => $canonical,
+            'image' => self::absoluteUrl($image ?? self::OG_IMAGE),
+            'imageWidth' => self::OG_IMAGE_WIDTH,
+            'imageHeight' => self::OG_IMAGE_HEIGHT,
+            'imageAlt' => $title,
+            'type' => 'website',
+            'robots' => $indexable ? 'index, follow, max-image-preview:large' : 'noindex, follow',
+            'schema' => self::graph($title, $description, $canonical, $breadcrumbs, $service),
         ];
     }
 
     /**
-     * Datos estructurados (schema.org) de la empresa para buscadores.
-     *
+     * URL absoluta sobre el dominio configurado en APP_URL, sin depender
+     * del host de la petición (evita canonicals con localhost o IP).
+     */
+    public static function absoluteUrl(string $path = '/'): string
+    {
+        $path = trim($path, '/');
+
+        return rtrim((string) config('app.url'), '/').($path === '' ? '/' : '/'.$path);
+    }
+
+    /**
+     * @param  list<array{name: string, url: string}>  $breadcrumbs
+     * @param  array<string, mixed>|null  $service
      * @return array<string, mixed>
      */
-    public static function organizationSchema(): array
+    private static function graph(string $title, string $description, string $canonical, array $breadcrumbs, ?array $service): array
     {
+        $home = self::absoluteUrl();
+        $organizationId = $home.'#organizacion';
+
+        $webPage = [
+            '@type' => 'WebPage',
+            '@id' => $canonical.'#pagina',
+            'url' => $canonical,
+            'name' => $title,
+            'description' => $description,
+            'inLanguage' => 'es-MX',
+            'isPartOf' => ['@id' => $home.'#sitio'],
+            'about' => ['@id' => $organizationId],
+        ];
+
+        $graph = [self::organization($organizationId), self::website($home, $organizationId)];
+
+        if ($breadcrumbs !== []) {
+            $webPage['breadcrumb'] = ['@id' => $canonical.'#migas'];
+            $graph[] = self::breadcrumbList($canonical, $breadcrumbs);
+        }
+
+        if ($service !== null) {
+            $webPage['mainEntity'] = ['@id' => $canonical.'#servicio'];
+            $graph[] = self::service($canonical, $service, $organizationId);
+        }
+
+        $graph[] = $webPage;
+
+        return ['@context' => 'https://schema.org', '@graph' => $graph];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function organization(string $id): array
+    {
+        $contact = config('spp.contact');
+
         return [
-            '@context' => 'https://schema.org',
-            '@type' => 'LocalBusiness',
-            '@id' => url('/').'#empresa',
+            '@type' => 'ProfessionalService',
+            '@id' => $id,
             'name' => config('spp.name'),
             'alternateName' => [config('spp.short_name'), 'SPP Seguridad Privada'],
             'legalName' => config('spp.legal_name'),
-            'description' => self::HOME_DESCRIPTION,
-            'url' => url('/'),
-            'logo' => url('/images/marca/logo-grande.webp'),
-            'image' => url('/images/marca/og-image.jpg'),
-            'telephone' => '+52 '.config('spp.contact.phone.label'),
-            'email' => config('spp.contact.email'),
-            'taxID' => 'SPP020301HV1',
+            'description' => config('spp.description'),
+            'url' => self::absoluteUrl(),
+            'logo' => self::absoluteUrl('/images/marca/logo-grande.webp'),
+            'image' => self::absoluteUrl(self::OG_IMAGE),
+            'telephone' => '+52 '.$contact['phone']['label'],
+            'email' => $contact['email'],
+            'taxID' => config('spp.rfc'),
             'address' => [
                 '@type' => 'PostalAddress',
-                'streetAddress' => config('spp.contact.address'),
-                'addressLocality' => 'Cuernavaca',
-                'addressRegion' => 'Morelos',
-                'addressCountry' => 'MX',
+                'streetAddress' => $contact['address'],
+                'addressLocality' => $contact['locality'],
+                'addressRegion' => $contact['region'],
+                'addressCountry' => $contact['country'],
             ],
-            'areaServed' => 'Morelos, México',
-            'hasMap' => config('spp.contact.maps_url'),
+            'geo' => [
+                '@type' => 'GeoCoordinates',
+                'latitude' => $contact['geo']['latitude'],
+                'longitude' => $contact['geo']['longitude'],
+            ],
+            'hasMap' => $contact['maps_url'],
+            'areaServed' => [
+                ['@type' => 'City', 'name' => 'Cuernavaca'],
+                ['@type' => 'State', 'name' => 'Morelos'],
+            ],
+            'knowsAbout' => ['Seguridad privada', 'Guardias de seguridad', 'Escoltas', 'Videovigilancia CCTV', 'Cercas eléctricas'],
             'sameAs' => array_column(config('spp.social'), 'url'),
-            'makesOffer' => array_map(fn (array $service) => [
-                '@type' => 'Offer',
-                'itemOffered' => [
-                    '@type' => 'Service',
-                    'name' => $service['name'],
-                    'description' => $service['summary'],
-                    'url' => url($service['url']),
-                ],
-            ], ServiceCatalog::summaries()),
+            'contactPoint' => [
+                '@type' => 'ContactPoint',
+                'telephone' => '+52 '.$contact['phone']['label'],
+                'email' => $contact['email'],
+                'contactType' => 'customer service',
+                'areaServed' => 'MX',
+                'availableLanguage' => 'es',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function website(string $home, string $organizationId): array
+    {
+        return [
+            '@type' => 'WebSite',
+            '@id' => $home.'#sitio',
+            'url' => $home,
+            'name' => config('spp.name'),
+            'alternateName' => config('spp.short_name'),
+            'inLanguage' => 'es-MX',
+            'publisher' => ['@id' => $organizationId],
+        ];
+    }
+
+    /**
+     * @param  list<array{name: string, url: string}>  $breadcrumbs
+     * @return array<string, mixed>
+     */
+    private static function breadcrumbList(string $canonical, array $breadcrumbs): array
+    {
+        $items = [['name' => 'Inicio', 'url' => '/'], ...$breadcrumbs];
+
+        return [
+            '@type' => 'BreadcrumbList',
+            '@id' => $canonical.'#migas',
+            'itemListElement' => array_map(fn (array $item, int $index) => [
+                '@type' => 'ListItem',
+                'position' => $index + 1,
+                'name' => $item['name'],
+                'item' => self::absoluteUrl($item['url']),
+            ], $items, array_keys($items)),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $service
+     * @return array<string, mixed>
+     */
+    private static function service(string $canonical, array $service, string $organizationId): array
+    {
+        return [
+            '@type' => 'Service',
+            '@id' => $canonical.'#servicio',
+            'name' => $service['name'],
+            'serviceType' => $service['serviceType'],
+            'description' => implode(' ', $service['overview']),
+            'url' => $canonical,
+            'image' => self::absoluteUrl($service['heroImage']['src']),
+            'provider' => ['@id' => $organizationId],
+            'areaServed' => $service['coverage'],
+            'audience' => [
+                '@type' => 'Audience',
+                'audienceType' => implode(', ', $service['audience']),
+            ],
         ];
     }
 }

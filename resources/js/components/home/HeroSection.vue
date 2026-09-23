@@ -1,15 +1,33 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
-import { ArrowRight, ChevronDown, ShieldCheck } from '@lucide/vue';
-import { onMounted, ref } from 'vue';
+import { ArrowRight, ChevronDown, MapPin } from '@lucide/vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import SiteLink from '@/components/common/SiteLink.vue';
 import { Button } from '@/components/ui/button';
 
-const company = usePage().props.company;
-const video = ref<HTMLVideoElement | null>(null);
-const showVideo = ref(true);
+type VideoSource = { src: string; type: string };
 
-onMounted(() => {
+const desktopVideo: VideoSource[] = [
+    { src: '/video/spp-inicio.webm', type: 'video/webm' },
+    { src: '/video/spp-inicio.mp4', type: 'video/mp4' },
+];
+
+const mobileVideo: VideoSource[] = [
+    { src: '/video/spp-inicio-720.webm', type: 'video/webm' },
+    { src: '/video/spp-inicio-720.mp4', type: 'video/mp4' },
+];
+
+const company = usePage().props.company;
+
+const videoSources = ref<VideoSource[]>([]);
+const videoReady = ref(false);
+let idleHandle: number | undefined;
+
+/**
+ * El poster es la imagen LCP; el video se solicita hasta que la página
+ * terminó de cargar y se muestra con un fundido cuando empieza a reproducirse.
+ */
+function loadVideo(): void {
     const reducedMotion = window.matchMedia(
         '(prefers-reduced-motion: reduce)',
     ).matches;
@@ -18,14 +36,43 @@ onMounted(() => {
             .connection?.saveData === true;
 
     if (reducedMotion || saveData) {
-        showVideo.value = false;
-
         return;
     }
 
-    video.value?.play().catch(() => {
-        showVideo.value = false;
-    });
+    videoSources.value = window.matchMedia('(min-width: 1024px)').matches
+        ? desktopVideo
+        : mobileVideo;
+}
+
+const supportsIdle =
+    typeof window !== 'undefined' && 'requestIdleCallback' in window;
+
+function scheduleVideo(): void {
+    idleHandle = supportsIdle
+        ? window.requestIdleCallback(loadVideo, { timeout: 2000 })
+        : globalThis.setTimeout(loadVideo, 600);
+}
+
+onMounted(() => {
+    if (document.readyState === 'complete') {
+        scheduleVideo();
+    } else {
+        window.addEventListener('load', scheduleVideo, { once: true });
+    }
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('load', scheduleVideo);
+
+    if (idleHandle === undefined) {
+        return;
+    }
+
+    if (supportsIdle) {
+        window.cancelIdleCallback(idleHandle);
+    } else {
+        globalThis.clearTimeout(idleHandle);
+    }
 });
 </script>
 
@@ -33,65 +80,69 @@ onMounted(() => {
     <section
         id="inicio"
         aria-labelledby="hero-title"
-        class="relative isolate flex min-h-[100svh] items-center overflow-hidden bg-ink-950 pt-(--header-height)"
+        class="on-dark relative isolate flex min-h-[max(34rem,88svh)] items-center overflow-hidden bg-ink-950 pt-(--header-height) lg:min-h-[min(100svh,58rem)]"
     >
         <img
-            :src="
-                showVideo
-                    ? '/images/home/hero-video-poster.webp'
-                    : '/images/home/hero-poster.webp'
+            src="/images/home/hero-video-poster.webp"
+            srcset="
+                /images/home/hero-video-poster-960.webp  960w,
+                /images/home/hero-video-poster.webp     1920w
             "
+            sizes="100vw"
             alt=""
-            width="1600"
-            height="900"
+            width="1920"
+            height="1080"
             fetchpriority="high"
+            decoding="async"
             class="absolute inset-0 -z-20 size-full object-cover"
         />
         <video
-            v-if="showVideo"
-            ref="video"
-            class="absolute inset-0 -z-20 size-full object-cover"
+            v-if="videoSources.length"
+            class="absolute inset-0 -z-20 size-full object-cover transition-opacity duration-700"
+            :class="videoReady ? 'opacity-100' : 'opacity-0'"
             autoplay
             muted
             loop
             playsinline
+            disablepictureinpicture
             preload="auto"
-            poster="/images/home/hero-video-poster.webp"
             aria-hidden="true"
             tabindex="-1"
+            @playing="videoReady = true"
         >
-            <source src="/video/spp-inicio.mp4" type="video/mp4" />
+            <source
+                v-for="source in videoSources"
+                :key="source.src"
+                :src="source.src"
+                :type="source.type"
+            />
         </video>
+
         <div
-            class="absolute inset-0 -z-10 bg-gradient-to-r from-ink-950/95 via-ink-950/75 to-ink-950/35"
+            class="absolute inset-0 -z-10 bg-gradient-to-t from-ink-950/90 via-ink-950/55 to-ink-950/35 lg:bg-gradient-to-r lg:from-ink-950/85 lg:via-ink-950/35 lg:to-transparent"
             aria-hidden="true"
         />
         <div
-            class="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-ink-950 to-transparent"
+            class="absolute inset-x-0 bottom-0 -z-10 h-24 bg-gradient-to-t from-ink-950/80 to-transparent"
             aria-hidden="true"
         />
 
-        <div class="container-spp py-16 sm:py-20">
-            <div class="grid items-center gap-12 lg:grid-cols-[1fr_auto]">
-                <div class="max-w-3xl">
-                    <img
-                        src="/images/marca/logo-grande.webp"
-                        alt=""
-                        width="720"
-                        height="643"
-                        class="hero-in mb-6 w-24 drop-shadow-[0_12px_24px_rgba(0,0,0,0.5)] sm:w-28 lg:hidden"
-                    />
+        <div class="container-spp py-14 sm:py-20">
+            <div class="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
+                <div class="max-w-2xl [text-shadow:0_1px_18px_rgb(0_0_0/0.45)]">
                     <p
-                        class="hero-in inline-flex items-center gap-2 rounded-full border border-gold-500/40 bg-gold-500/10 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-gold-400 sm:text-sm"
+                        class="hero-in inline-flex items-center gap-2 rounded-full border border-white/20 bg-ink-950/45 px-3.5 py-1.5 text-xs font-medium tracking-wide text-white/90 backdrop-blur-sm sm:text-sm"
                     >
-                        <ShieldCheck class="size-4" aria-hidden="true" />
-                        Más de {{ company.yearsOfExperience }} años de
-                        experiencia en seguridad privada
+                        <MapPin
+                            class="size-4 text-gold-500"
+                            aria-hidden="true"
+                        />
+                        Seguridad privada en Cuernavaca, Morelos
                     </p>
 
                     <h1
                         id="hero-title"
-                        class="hero-in mt-6 text-4xl leading-[1.08] font-bold text-white [animation-delay:80ms] sm:text-5xl lg:text-6xl xl:text-[4.25rem]"
+                        class="hero-in mt-5 text-[2.35rem] leading-[1.05] font-bold text-white [animation-delay:80ms] sm:text-5xl lg:text-6xl xl:text-[4.25rem]"
                     >
                         Servicios de
                         <span class="text-gold-500">Protección</span>
@@ -99,7 +150,7 @@ onMounted(() => {
                     </h1>
 
                     <p
-                        class="hero-in mt-6 max-w-2xl text-base leading-relaxed text-pretty text-white/80 [animation-delay:160ms] sm:text-lg"
+                        class="hero-in mt-5 max-w-xl text-base leading-relaxed text-pretty text-white/90 [animation-delay:160ms] sm:text-lg"
                     >
                         Somos una empresa dedicada a la protección y vigilancia
                         de bienes muebles e inmuebles, con
@@ -112,24 +163,18 @@ onMounted(() => {
                     </p>
 
                     <div
-                        class="hero-in mt-9 flex flex-col gap-3 [animation-delay:240ms] sm:flex-row sm:flex-wrap"
+                        class="hero-in mt-8 flex flex-col gap-3 [animation-delay:240ms] [text-shadow:none] sm:flex-row sm:flex-wrap sm:items-center"
                     >
-                        <Button as-child size="lg">
+                        <Button as-child size="lg" class="group/cta">
                             <SiteLink href="#cotizar">
                                 Solicitar cotización
-                                <ArrowRight />
+                                <ArrowRight
+                                    class="transition-transform group-hover/cta:translate-x-0.5"
+                                />
                             </SiteLink>
                         </Button>
                         <Button as-child size="lg" variant="light">
-                            <SiteLink href="/#empresa">Saber más</SiteLink>
-                        </Button>
-                        <Button
-                            as-child
-                            size="lg"
-                            variant="link"
-                            class="text-white hover:text-gold-400 sm:px-3"
-                        >
-                            <SiteLink href="/servicios">
+                            <SiteLink href="/#servicios">
                                 Ver nuestros servicios
                             </SiteLink>
                         </Button>
@@ -141,31 +186,33 @@ onMounted(() => {
                     alt="Escudo de Servicios de Protección Profesional S.A. de C.V."
                     width="720"
                     height="643"
-                    class="hero-in hidden w-72 drop-shadow-[0_20px_40px_rgba(0,0,0,0.55)] [animation-delay:200ms] lg:block xl:w-80"
+                    class="hero-in hidden w-64 drop-shadow-[0_20px_40px_rgba(0,0,0,0.55)] [animation-delay:200ms] lg:block xl:w-72"
                 />
             </div>
         </div>
 
         <SiteLink
             href="/#empresa"
-            class="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 rounded-md text-xs tracking-widest text-white/60 uppercase transition-colors hover:text-gold-400 sm:flex"
-            aria-label="Ir a Filosofía Empresarial"
+            class="group/hint absolute bottom-5 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 rounded-md px-2 py-1 text-xs tracking-[0.2em] text-white/75 uppercase transition-colors duration-150 hover:text-gold-400 sm:flex"
         >
-            <span aria-hidden="true">Conócenos</span>
-            <ChevronDown class="size-5 animate-bounce" aria-hidden="true" />
+            Saber más
+            <ChevronDown
+                class="size-5 motion-safe:animate-scroll-hint"
+                aria-hidden="true"
+            />
         </SiteLink>
     </section>
 </template>
 
 <style scoped>
 .hero-in {
-    animation: hero-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: hero-in 0.8s var(--ease-out-soft) both;
 }
 
 @keyframes hero-in {
     from {
         opacity: 0;
-        transform: translateY(1rem);
+        transform: translateY(0.75rem);
     }
 }
 </style>

@@ -30,6 +30,11 @@ return [
     'contact' => [
         'address' => 'Av. Lomas del Tzompantle 200',
         'city' => 'Cuernavaca, Morelos',
+        'locality' => 'Cuernavaca',
+        'region' => 'Morelos',
+        'country' => 'MX',
+        // Coordenadas tomadas del mapa incrustado del sitio anterior.
+        'geo' => ['latitude' => 18.924676, 'longitude' => -99.248801],
         'phone' => [
             'label' => '777 102 26 76',
             'href' => 'tel:+527771022676',
@@ -47,6 +52,28 @@ return [
     'social' => [
         ['network' => 'facebook', 'label' => 'Facebook', 'url' => 'https://www.facebook.com/share/1KF5JpFEp3/'],
         ['network' => 'instagram', 'label' => 'Instagram', 'url' => 'https://www.instagram.com/spp_morelos/'],
+    ],
+
+    'rfc' => 'SPP020301HV1',
+
+    'authorization' => 'Autorización de Funcionamiento No. 082 de la Dirección General de Seguridad Privada del Estado de Morelos',
+
+    /*
+    |--------------------------------------------------------------------------
+    | SEO
+    |--------------------------------------------------------------------------
+    |
+    | `updated_at` es la fecha de la última actualización del contenido y se
+    | publica como <lastmod> en el sitemap. Actualízala al cambiar textos.
+    |
+    */
+
+    'seo' => [
+        'updated_at' => '2026-09-23',
+        'home_title' => 'SPP Seguridad Privada en Cuernavaca, Morelos | Servicios de Protección Profesional',
+        'home_description' => 'SPP, empresa de seguridad privada en Cuernavaca, Morelos, con más de 20 años de experiencia. Guardias intramuros, escoltas, CCTV y cercas eléctricas.',
+        'services_title' => 'Servicios de Seguridad Privada en Cuernavaca y Morelos | SPP',
+        'services_description' => 'Guardias intramuros, escoltas profesionales, instalación de CCTV y cercas eléctricas y de navajas. Servicios de vigilancia de SPP en Cuernavaca, Morelos.',
     ],
 
     'documents' => [

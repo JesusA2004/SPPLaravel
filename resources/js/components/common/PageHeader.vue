@@ -13,7 +13,7 @@ defineProps<{
 
 <template>
     <section
-        class="relative isolate overflow-hidden bg-ink-950 pt-(--header-height) text-white"
+        class="on-dark relative isolate overflow-hidden bg-ink-950 pt-(--header-height) text-white"
     >
         <img
             v-if="image"

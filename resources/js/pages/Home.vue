@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SeoHead from '@/components/common/SeoHead.vue';
+import TrustBar from '@/components/common/TrustBar.vue';
 import QuoteSection from '@/components/contact/QuoteSection.vue';
 import ClientsSection from '@/components/home/ClientsSection.vue';
 import HeroSection from '@/components/home/HeroSection.vue';
@@ -12,15 +13,15 @@ defineProps<{
     philosophy: Philosophy;
     clientsIntro: string;
     clients: Client[];
-    quotePrefill: string | null;
 }>();
 </script>
 
 <template>
     <SeoHead :seo="seo" />
     <HeroSection />
+    <TrustBar />
     <PhilosophySection :philosophy="philosophy" />
     <ClientsSection :intro="clientsIntro" :clients="clients" />
-    <ServicesSection />
-    <QuoteSection :prefill="quotePrefill" />
+    <ServicesSection link-to-all />
+    <QuoteSection />
 </template>

@@ -36,7 +36,7 @@ const activeClass =
                         {{ entry.label }}
                     </NavigationMenuTrigger>
                     <NavigationMenuContent
-                        class="mt-3! rounded-xl! border-white/10! bg-ink-900! p-2 text-white shadow-2xl! shadow-black/40!"
+                        class="on-dark mt-3! overflow-visible! rounded-xl! border-white/10! bg-ink-900! p-2 text-white shadow-2xl! shadow-black/40! duration-200! before:absolute before:inset-x-0 before:-top-3.5 before:h-3.5 before:content-[''] data-[state=closed]:slide-out-to-top-1 data-[state=open]:slide-in-from-top-1"
                         :class="{
                             'right-0 left-auto': entry.children.length > 4,
                         }"

@@ -9,21 +9,21 @@ import MobileNav from '@/components/navigation/MobileNav.vue';
 import { useNavigation } from '@/components/navigation/useNavigation';
 import { Button } from '@/components/ui/button';
 
-const { entries, isHome, isActive, isCurrentLink } = useNavigation();
+const { entries, isActive, isCurrentLink } = useNavigation();
 const { y } = useWindowScroll();
 
-const isTransparent = computed(() => isHome.value && y.value < 40);
+const isTransparent = computed(() => y.value < 40);
 </script>
 
 <template>
-    <header class="fixed inset-x-0 top-0 z-40">
+    <header class="on-dark fixed inset-x-0 top-0 z-40">
         <div
-            class="absolute inset-0 -z-10 transition-[background-color,box-shadow,border-color] duration-300"
-            :class="
-                isTransparent
-                    ? 'border-b border-transparent bg-gradient-to-b from-black/60 to-transparent'
-                    : 'border-b border-white/8 bg-ink-950/92 shadow-lg shadow-black/20 backdrop-blur-md'
-            "
+            class="absolute inset-0 -z-10 bg-gradient-to-b from-black/55 to-transparent"
+            aria-hidden="true"
+        />
+        <div
+            class="absolute inset-0 -z-10 border-b border-white/8 bg-ink-950/90 shadow-lg shadow-black/20 backdrop-blur-md transition-opacity duration-300"
+            :class="isTransparent ? 'opacity-0' : 'opacity-100'"
             aria-hidden="true"
         />
         <div
@@ -31,7 +31,7 @@ const isTransparent = computed(() => isHome.value && y.value < 40);
         >
             <SiteLink
                 href="/"
-                class="shrink-0 rounded-md"
+                class="group shrink-0 rounded-md"
                 aria-label="Servicios de Protección Profesional, ir al inicio"
             >
                 <BrandLogo />

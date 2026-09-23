@@ -1,27 +1,23 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { Send } from '@lucide/vue';
-import { ref } from 'vue';
+import { CircleAlert, Send } from '@lucide/vue';
+import { computed, ref } from 'vue';
 import { store } from '@/actions/App/Http/Controllers/QuoteRequestController';
 import FormField from '@/components/contact/FormField.vue';
-import QuoteResultDialog from '@/components/contact/QuoteResultDialog.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
-import type { QuoteStatus } from '@/types';
+import type { QuoteFields, QuoteStatus } from '@/types';
 
 const props = defineProps<{
     prefill?: string | null;
+    labelledBy: string;
 }>();
 
-type QuoteFields = {
-    nombre: string;
-    correo: string;
-    telefono: string;
-    empresa: string;
-    descripcion: string;
-};
+const emit = defineEmits<{
+    success: [submitted: QuoteFields];
+}>();
 
 const form = useForm({
     nombre: '',
@@ -32,8 +28,19 @@ const form = useForm({
     sitio_web: '',
 });
 
-const resultStatus = ref<QuoteStatus | null>(null);
-const submitted = ref<QuoteFields | null>(null);
+const failure = ref<Exclude<QuoteStatus, 'success'> | null>(null);
+
+const failureMessages: Record<Exclude<QuoteStatus, 'success'>, string> = {
+    error: 'No pudimos enviar tu solicitud en este momento. Tus datos siguen aquí: inténtalo de nuevo o contáctanos por teléfono o WhatsApp.',
+    throttled:
+        'Recibimos varias solicitudes desde tu conexión en poco tiempo. Espera unos minutos e inténtalo de nuevo.',
+    expired:
+        'La página estuvo inactiva demasiado tiempo. Tus datos siguen aquí: vuelve a enviar el formulario.',
+};
+
+const failureMessage = computed(() =>
+    failure.value ? failureMessages[failure.value] : null,
+);
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -85,6 +92,8 @@ function submit(): void {
         return;
     }
 
+    failure.value = null;
+
     if (!validate()) {
         focusFirstError();
 
@@ -106,20 +115,20 @@ function submit(): void {
             const status = page.flash.quote?.status ?? 'error';
 
             if (status === 'success') {
-                submitted.value = payload;
                 form.reset();
+                emit('success', payload);
+            } else {
+                failure.value = status;
             }
-
-            resultStatus.value = status;
         },
         onError: () => focusFirstError(),
         onHttpException: () => {
-            resultStatus.value = 'error';
+            failure.value = 'error';
 
             return false;
         },
         onNetworkError: () => {
-            resultStatus.value = 'error';
+            failure.value = 'error';
 
             return false;
         },
@@ -130,7 +139,7 @@ function submit(): void {
 <template>
     <form
         novalidate
-        aria-labelledby="cotizar-title"
+        :aria-labelledby="labelledBy"
         class="space-y-5"
         @submit.prevent="submit"
     >
@@ -252,6 +261,20 @@ function submit(): void {
             />
         </div>
 
+        <div aria-live="polite">
+            <p
+                v-if="failureMessage"
+                class="flex gap-3 rounded-lg border border-destructive/25 bg-red-50 p-4 text-sm leading-relaxed text-destructive"
+                role="alert"
+            >
+                <CircleAlert
+                    class="mt-0.5 size-5 shrink-0"
+                    aria-hidden="true"
+                />
+                {{ failureMessage }}
+            </p>
+        </div>
+
         <div
             class="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center sm:justify-between"
         >
@@ -264,7 +287,7 @@ function submit(): void {
             <Button
                 type="submit"
                 size="lg"
-                class="w-full sm:w-auto"
+                class="w-full sm:w-auto sm:min-w-52"
                 :disabled="form.processing"
                 :aria-busy="form.processing"
             >
@@ -274,10 +297,4 @@ function submit(): void {
             </Button>
         </div>
     </form>
-
-    <QuoteResultDialog
-        :status="resultStatus"
-        :submitted="submitted"
-        @close="resultStatus = null"
-    />
 </template>

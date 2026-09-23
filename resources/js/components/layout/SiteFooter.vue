@@ -16,7 +16,7 @@ const year = new Date().getFullYear();
     <footer
         id="contacto"
         aria-labelledby="footer-title"
-        class="relative bg-ink-950 text-white/70"
+        class="on-dark relative bg-ink-950 text-white/70"
     >
         <div
             class="h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent opacity-60"
@@ -44,8 +44,9 @@ const year = new Date().getFullYear();
                             {{ company.name }}
                         </h2>
                         <p class="text-sm text-gold-500">
-                            Más de {{ company.yearsOfExperience }} años
-                            protegiendo lo que más importa
+                            Seguridad privada en {{ company.contact.city }} ·
+                            más de {{ company.yearsOfExperience }} años de
+                            experiencia
                         </p>
                     </div>
                 </div>
@@ -110,7 +111,7 @@ const year = new Date().getFullYear();
                                 <a
                                     :href="document.url"
                                     target="_blank"
-                                    rel="noopener"
+                                    rel="noopener noreferrer"
                                     class="group flex items-center gap-3 rounded-lg border border-white/10 px-3 py-2.5 text-sm transition-colors hover:border-gold-500/50 hover:text-white"
                                 >
                                     <FileText
@@ -138,15 +139,25 @@ const year = new Date().getFullYear();
                     <div>
                         <h3 class="footer-heading">Contacto</h3>
                         <address class="space-y-3 text-sm not-italic">
-                            <p class="flex gap-3">
-                                <MapPin
-                                    class="mt-0.5 size-4 shrink-0 text-gold-500"
-                                    aria-hidden="true"
-                                />
-                                <span>
-                                    {{ company.contact.address }}<br />
-                                    {{ company.contact.city }}
-                                </span>
+                            <p>
+                                <a
+                                    :href="company.contact.mapsUrl"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="footer-link flex gap-3"
+                                >
+                                    <MapPin
+                                        class="mt-0.5 size-4 shrink-0 text-gold-500"
+                                        aria-hidden="true"
+                                    />
+                                    <span>
+                                        {{ company.contact.address }}<br />
+                                        {{ company.contact.city }}
+                                        <span class="sr-only">
+                                            (abrir en Google Maps)
+                                        </span>
+                                    </span>
+                                </a>
                             </p>
                             <p>
                                 <a
@@ -271,7 +282,7 @@ const year = new Date().getFullYear();
 }
 
 .footer-link {
-    @apply rounded-sm transition-colors hover:text-gold-400;
+    @apply rounded-sm decoration-gold-500/60 underline-offset-4 transition-colors duration-150 hover:text-gold-400 hover:underline;
 }
 
 .social-link {
