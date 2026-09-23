@@ -44,14 +44,53 @@ class Seo
     }
 
     /**
-     * URL absoluta sobre el dominio configurado en APP_URL, sin depender
-     * del host de la petición (evita canonicals con localhost o IP).
+     * URL absoluta sobre el dominio canónico (ver baseUrl()).
      */
     public static function absoluteUrl(string $path = '/'): string
     {
         $path = trim($path, '/');
 
-        return rtrim((string) config('app.url'), '/').($path === '' ? '/' : '/'.$path);
+        return self::baseUrl().($path === '' ? '/' : '/'.$path);
+    }
+
+    /**
+     * Dominio canónico: APP_URL cuando apunta a un dominio público. Si quedó
+     * con un valor local (localhost, 127.0.0.1…), se usa el dominio de la
+     * petición sin "www" para que canonical, Open Graph y sitemap nunca
+     * anuncien una dirección inaccesible para buscadores y redes sociales.
+     */
+    public static function baseUrl(): string
+    {
+        $configured = rtrim((string) config('app.url'), '/');
+
+        if (! self::isLocalUrl($configured) || (app()->runningInConsole() && ! app()->runningUnitTests())) {
+            return $configured;
+        }
+
+        $request = request();
+        $host = preg_replace('/^www\./i', '', $request->getHost());
+
+        if (self::isLocalUrl('http://'.$host)) {
+            return $configured;
+        }
+
+        if ($request->isSecure() || app()->isProduction()) {
+            return 'https://'.$host;
+        }
+
+        return $request->getSchemeAndHttpHost() === $request->getScheme().'://'.$request->getHost()
+            ? $request->getScheme().'://'.$host
+            : $request->getScheme().'://'.$host.':'.$request->getPort();
+    }
+
+    public static function isLocalUrl(string $url): bool
+    {
+        $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+
+        return $host === ''
+            || in_array($host, ['localhost', '127.0.0.1', '::1', '[::1]', '0.0.0.0'], true)
+            || str_ends_with($host, '.localhost')
+            || str_ends_with($host, '.test');
     }
 
     /**

@@ -103,3 +103,25 @@ test('robots.txt permite el rastreo y apunta al sitemap', function () {
     expect($response->headers->get('Content-Type'))->toStartWith('text/plain')
         ->and($response->getContent())->toBe("User-agent: *\nAllow: /\n\nSitemap: https://seguridadprivadaspp.com/sitemap.xml\n");
 });
+
+test('si APP_URL quedó en localhost se usa el dominio real de la visita', function (string $requestUrl) {
+    config(['app.url' => 'http://localhost:8000']);
+
+    $response = $this->get($requestUrl)->assertOk();
+
+    $response
+        ->assertSee('rel="canonical" href="https://seguridadprivadaspp.com/"', false)
+        ->assertSee('property="og:image" content="https://seguridadprivadaspp.com/images/marca/og-image.jpg"', false)
+        ->assertSee('name="twitter:image" content="https://seguridadprivadaspp.com/images/marca/og-image.jpg"', false)
+        ->assertDontSee('localhost:8000', false);
+
+    $this->get($requestUrl.'robots.txt')
+        ->assertSee('Sitemap: https://seguridadprivadaspp.com/sitemap.xml');
+})->with(['https://seguridadprivadaspp.com/', 'https://www.seguridadprivadaspp.com/']);
+
+test('en local se conserva APP_URL', function () {
+    config(['app.url' => 'http://localhost:8000']);
+
+    $this->get('http://localhost:8000/')
+        ->assertSee('rel="canonical" href="http://localhost:8000/"', false);
+});
