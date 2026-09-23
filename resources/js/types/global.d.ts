@@ -1,7 +1,6 @@
 import type { Directive } from 'vue';
-import type { Auth } from '@/types/auth';
+import type { Company, QuoteStatus, ServiceSummary } from '@/types/site';
 
-// Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
     interface ImportMetaEnv {
         readonly VITE_APP_NAME: string;
@@ -17,22 +16,18 @@ declare module 'vite/client' {
 declare module '@inertiajs/core' {
     export interface InertiaConfig {
         sharedPageProps: {
-            name: string;
-            auth: Auth;
-            sidebarOpen: boolean;
+            company: Company;
+            services: ServiceSummary[];
             [key: string]: unknown;
+        };
+        flashDataType: {
+            quote?: { status: QuoteStatus };
         };
     }
 }
 
 declare module 'vue' {
     interface GlobalDirectives {
-        vFocus: Directive<HTMLElement, boolean | undefined>;
-    }
-
-    interface ComponentCustomProperties {
-        $inertia: typeof Router;
-        $page: Page;
-        $headManager: ReturnType<typeof createHeadManager>;
+        vReveal: Directive<HTMLElement, number | undefined>;
     }
 }

@@ -1,12 +1,14 @@
 <?php
 
-use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Support\Seo;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,10 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
-
         $middleware->web(append: [
-            HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
@@ -27,4 +26,39 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
+            $status = $response->getStatusCode();
+
+            if ($request->expectsJson()) {
+                return $response;
+            }
+
+            if ($status === 419) {
+                Inertia::flash('quote', ['status' => 'expired']);
+
+                return back();
+            }
+
+            if (config('app.debug') && $status >= 500) {
+                return $response;
+            }
+
+            if (! $request->isMethod('GET') && $status >= 500) {
+                Inertia::flash('quote', ['status' => 'error']);
+
+                return back();
+            }
+
+            if (! in_array($status, [403, 404, 500, 503])) {
+                return $response;
+            }
+
+            return Inertia::render('Error', [
+                'status' => $status,
+                'seo' => Seo::make($status === 404 ? 'Página no encontrada' : 'Error'),
+            ])
+                ->toResponse($request)
+                ->setStatusCode($status);
+        });
     })->create();

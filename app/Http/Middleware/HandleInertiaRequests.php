@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\ServiceCatalog;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -10,26 +12,12 @@ class HandleInertiaRequests extends Middleware
     /**
      * The root template that's loaded on the first page visit.
      *
-     * @see https://inertiajs.com/server-side-setup#root-template
-     *
      * @var string
      */
     protected $rootView = 'app';
 
     /**
-     * Determines the current asset version.
-     *
-     * @see https://inertiajs.com/asset-versioning
-     */
-    public function version(Request $request): ?string
-    {
-        return parent::version($request);
-    }
-
-    /**
      * Define the props that are shared by default.
-     *
-     * @see https://inertiajs.com/shared-data
      *
      * @return array<string, mixed>
      */
@@ -37,11 +25,40 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            'name' => config('app.name'),
-            'auth' => [
-                'user' => $request->user(),
+            'company' => Inertia::once(fn () => $this->company()),
+            'services' => Inertia::once(fn () => ServiceCatalog::summaries()),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function company(): array
+    {
+        $whatsapp = config('spp.contact.whatsapp');
+
+        return [
+            'name' => config('spp.name'),
+            'shortName' => config('spp.short_name'),
+            'legalName' => config('spp.legal_name'),
+            'yearsOfExperience' => config('spp.years_of_experience'),
+            'description' => config('spp.description'),
+            'about' => config('spp.about'),
+            'qualityPolicy' => config('spp.quality_policy'),
+            'contact' => [
+                'address' => config('spp.contact.address'),
+                'city' => config('spp.contact.city'),
+                'phone' => config('spp.contact.phone'),
+                'email' => config('spp.contact.email'),
+                'whatsapp' => [
+                    'label' => $whatsapp['label'],
+                    'url' => 'https://wa.me/'.$whatsapp['number'].'?text='.rawurlencode($whatsapp['message']),
+                ],
+                'mapsUrl' => config('spp.contact.maps_url'),
+                'mapsEmbedUrl' => config('spp.contact.maps_embed_url'),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'social' => config('spp.social'),
+            'documents' => config('spp.documents'),
         ];
     }
 }
