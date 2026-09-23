@@ -21,3 +21,5 @@ Route::post('cotizacion', [QuoteRequestController::class, 'store'])
 
 Route::get('sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::get('robots.txt', [SeoController::class, 'robots'])->name('robots');
+
+Route::fallback(fn () => abort(404));

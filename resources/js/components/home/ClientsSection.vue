@@ -85,15 +85,15 @@ onMounted(() => {
                     :opts="{ loop: true, align: 'start' }"
                     :plugins="[autoplay]"
                     aria-label="Logotipos de clientes distinguidos"
-                    class="focus-visible:outline-offset-8"
+                    class="-mr-4 focus-visible:outline-offset-8 sm:-mr-5"
                     @init-api="onInit"
                 >
-                    <CarouselContent class="-ml-5">
+                    <CarouselContent class="ml-0">
                         <CarouselItem
                             v-for="(client, index) in clients"
                             :key="client.name"
                             :aria-label="`${index + 1} de ${clients.length}`"
-                            class="basis-1/2 pl-5 md:basis-1/3 lg:basis-1/4"
+                            class="basis-1/2 pr-5 pl-0 md:basis-1/3 lg:basis-1/4"
                         >
                             <figure
                                 class="flex h-36 items-center justify-center rounded-xl border border-border bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-navy-700/25 hover:shadow-md sm:h-44"
@@ -116,7 +116,7 @@ onMounted(() => {
                         class="-left-2 hidden size-11 border-border bg-white shadow-sm hover:bg-navy-900 hover:text-white sm:inline-flex"
                     />
                     <CarouselNext
-                        class="-right-2 hidden size-11 border-border bg-white shadow-sm hover:bg-navy-900 hover:text-white sm:inline-flex"
+                        class="right-3 hidden size-11 border-border bg-white shadow-sm hover:bg-navy-900 hover:text-white sm:inline-flex"
                     />
                 </Carousel>
 

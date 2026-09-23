@@ -5,6 +5,7 @@ export type NavLink = {
     href: string;
     description?: string;
     icon?: string;
+    lightIconBackground?: boolean;
 };
 
 export type NavGroup = {
@@ -24,18 +25,21 @@ export const philosophyLinks: NavLink[] = [
         href: '/#mision',
         description: 'Nuestro compromiso con los clientes y la sociedad.',
         icon: '/images/iconos/mision.webp',
+        lightIconBackground: true,
     },
     {
         label: 'Visión',
         href: '/#vision',
         description: 'La organización que buscamos ser.',
         icon: '/images/iconos/vision.webp',
+        lightIconBackground: true,
     },
     {
         label: 'Valores',
         href: '/#valores',
         description: 'Los principios que guían nuestro trabajo.',
         icon: '/images/iconos/valores.webp',
+        lightIconBackground: true,
     },
     {
         label: 'Clientes Distinguidos',

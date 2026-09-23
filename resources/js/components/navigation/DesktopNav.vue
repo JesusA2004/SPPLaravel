@@ -37,6 +37,9 @@ const activeClass =
                     </NavigationMenuTrigger>
                     <NavigationMenuContent
                         class="mt-3! rounded-xl! border-white/10! bg-ink-900! p-2 text-white shadow-2xl! shadow-black/40!"
+                        :class="{
+                            'right-0 left-auto': entry.children.length > 4,
+                        }"
                     >
                         <ul
                             class="grid gap-1"
@@ -62,7 +65,12 @@ const activeClass =
                                 >
                                     <SiteLink :href="child.href">
                                         <span
-                                            class="flex size-11 shrink-0 items-center justify-center rounded-lg bg-white/6 ring-1 ring-white/10 transition-colors group-hover/link:ring-gold-500/40"
+                                            class="flex size-11 shrink-0 items-center justify-center rounded-lg ring-1 ring-white/10 transition-colors group-hover/link:ring-gold-500/40"
+                                            :class="
+                                                child.lightIconBackground
+                                                    ? 'bg-white'
+                                                    : 'bg-white/6'
+                                            "
                                         >
                                             <img
                                                 :src="child.icon"

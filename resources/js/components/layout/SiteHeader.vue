@@ -16,14 +16,16 @@ const isTransparent = computed(() => isHome.value && y.value < 40);
 </script>
 
 <template>
-    <header
-        class="fixed inset-x-0 top-0 z-40 transition-[background-color,box-shadow,border-color] duration-300"
-        :class="
-            isTransparent
-                ? 'border-b border-transparent bg-gradient-to-b from-black/60 to-transparent'
-                : 'border-b border-white/8 bg-ink-950/92 shadow-lg shadow-black/20 backdrop-blur-md'
-        "
-    >
+    <header class="fixed inset-x-0 top-0 z-40">
+        <div
+            class="absolute inset-0 -z-10 transition-[background-color,box-shadow,border-color] duration-300"
+            :class="
+                isTransparent
+                    ? 'border-b border-transparent bg-gradient-to-b from-black/60 to-transparent'
+                    : 'border-b border-white/8 bg-ink-950/92 shadow-lg shadow-black/20 backdrop-blur-md'
+            "
+            aria-hidden="true"
+        />
         <div
             class="container-spp flex h-(--header-height) items-center justify-between gap-4"
         >

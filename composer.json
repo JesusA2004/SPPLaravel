@@ -1,13 +1,14 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/vue-starter-kit",
+    "name": "spp/sitio-web",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Sitio web de Servicios de Protección Profesional (SPP).",
     "keywords": [
-        "laravel",
-        "framework"
+        "seguridad privada",
+        "spp",
+        "laravel"
     ],
-    "license": "MIT",
+    "license": "proprietary",
     "require": {
         "php": "^8.3",
         "inertiajs/inertia-laravel": "^3.0",
@@ -46,13 +47,12 @@
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
-            "@php artisan migrate --force",
             "npm install",
             "npm run build"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"npm run dev\" --names='server,queue,vite'"
+            "npx concurrently -c \"#93c5fd,#fdba74\" \"php artisan serve\" \"npm run dev\" --names=server,vite"
         ],
         "lint": [
             "pint --parallel"

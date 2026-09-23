@@ -116,12 +116,21 @@ function close(): void {
                                             "
                                             @navigate="close"
                                         >
-                                            <img
-                                                :src="child.icon"
-                                                alt=""
-                                                class="size-6 shrink-0 object-contain"
-                                                loading="lazy"
-                                            />
+                                            <span
+                                                class="flex size-8 shrink-0 items-center justify-center rounded-md"
+                                                :class="
+                                                    child.lightIconBackground
+                                                        ? 'bg-white'
+                                                        : 'bg-white/6'
+                                                "
+                                            >
+                                                <img
+                                                    :src="child.icon"
+                                                    alt=""
+                                                    class="size-5 object-contain"
+                                                    loading="lazy"
+                                                />
+                                            </span>
                                             {{ child.label }}
                                         </SiteLink>
                                     </li>

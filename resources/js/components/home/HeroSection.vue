@@ -36,7 +36,11 @@ onMounted(() => {
         class="relative isolate flex min-h-[100svh] items-center overflow-hidden bg-ink-950 pt-(--header-height)"
     >
         <img
-            src="/images/home/hero-poster.webp"
+            :src="
+                showVideo
+                    ? '/images/home/hero-video-poster.webp'
+                    : '/images/home/hero-poster.webp'
+            "
             alt=""
             width="1600"
             height="900"
@@ -52,7 +56,7 @@ onMounted(() => {
             loop
             playsinline
             preload="auto"
-            poster="/images/home/hero-poster.webp"
+            poster="/images/home/hero-video-poster.webp"
             aria-hidden="true"
             tabindex="-1"
         >
