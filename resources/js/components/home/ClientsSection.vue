@@ -17,12 +17,19 @@ defineProps<{
     clients: Client[];
 }>();
 
+/**
+ * stopOnMouseEnter va en false a propósito: ese modo registra sus propios
+ * listeners de mouseenter/mouseleave que pelean con el botón manual de
+ * play/pausa (el cursor pasando cerca al hacer clic podía dejar el
+ * autoscroll "atascado" sin reanudar). El control de reproducción queda
+ * exclusivamente en manos de togglePause().
+ */
 const autoScroll = AutoScroll({
     speed: 0.6,
     startDelay: 1200,
     playOnInit: false,
     stopOnInteraction: false,
-    stopOnMouseEnter: true,
+    stopOnMouseEnter: false,
     stopOnFocusIn: true,
 });
 
