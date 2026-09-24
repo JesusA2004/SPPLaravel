@@ -47,7 +47,10 @@ function getObserver(): IntersectionObserver {
  */
 export const reveal: Directive<HTMLElement, number | undefined> = {
     mounted(el, binding) {
-        if (typeof IntersectionObserver === 'undefined') {
+        if (
+            typeof IntersectionObserver === 'undefined' ||
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ) {
             return;
         }
 

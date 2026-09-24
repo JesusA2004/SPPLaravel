@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
-import { ArrowRight, ChevronDown, MapPin } from '@lucide/vue';
+import { ArrowRight, ChevronDown, MapPin, Pause, Play } from '@lucide/vue';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import SiteLink from '@/components/common/SiteLink.vue';
 import { Button } from '@/components/ui/button';
@@ -19,23 +19,26 @@ const mobileVideo: VideoSource[] = [
 
 const company = usePage().props.company;
 
+const videoEl = ref<HTMLVideoElement | null>(null);
 const videoSources = ref<VideoSource[]>([]);
 const videoReady = ref(false);
+const videoFailed = ref(false);
+const isPaused = ref(false);
 let idleHandle: number | undefined;
 
 /**
  * El poster es la imagen LCP; el video se solicita hasta que la página
  * terminó de cargar y se muestra con un fundido cuando empieza a reproducirse.
+ * prefers-reduced-motion NO bloquea el video: solo quita transiciones y
+ * animaciones decorativas (ver app.css). Únicamente Save-Data lo evita,
+ * porque ahí el usuario pidió explícitamente ahorrar datos.
  */
 function loadVideo(): void {
-    const reducedMotion = window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
-    ).matches;
     const saveData =
         (navigator as Navigator & { connection?: { saveData?: boolean } })
             .connection?.saveData === true;
 
-    if (reducedMotion || saveData) {
+    if (saveData) {
         return;
     }
 
@@ -51,6 +54,59 @@ function scheduleVideo(): void {
     idleHandle = supportsIdle
         ? window.requestIdleCallback(loadVideo, { timeout: 2000 })
         : globalThis.setTimeout(loadVideo, 600);
+}
+
+/**
+ * Refuerza el autoplay del atributo HTML: algunos navegadores/webviews no
+ * lo disparan de forma fiable, así que se intenta explícitamente en cuanto
+ * el video puede reproducirse. Si el navegador lo bloquea, el usuario
+ * siempre puede darle al botón de reproducir.
+ */
+function handleCanPlay(): void {
+    const el = videoEl.value;
+
+    if (!el) {
+        return;
+    }
+
+    el.muted = true;
+    el.play().catch(() => undefined);
+}
+
+function handlePlaying(): void {
+    videoReady.value = true;
+    videoFailed.value = false;
+    isPaused.value = false;
+}
+
+function handlePause(): void {
+    isPaused.value = true;
+}
+
+function handleError(): void {
+    videoFailed.value = true;
+    videoReady.value = false;
+}
+
+async function toggleVideo(): Promise<void> {
+    const el = videoEl.value;
+
+    if (!el) {
+        return;
+    }
+
+    if (el.paused) {
+        try {
+            el.muted = true;
+            await el.play();
+            isPaused.value = false;
+        } catch {
+            videoFailed.value = true;
+        }
+    } else {
+        el.pause();
+        isPaused.value = true;
+    }
 }
 
 onMounted(() => {
@@ -97,7 +153,8 @@ onBeforeUnmount(() => {
             class="absolute inset-0 -z-20 size-full object-cover"
         />
         <video
-            v-if="videoSources.length"
+            v-if="videoSources.length && !videoFailed"
+            ref="videoEl"
             class="absolute inset-0 -z-20 size-full object-cover transition-opacity duration-700"
             :class="videoReady ? 'opacity-100' : 'opacity-0'"
             autoplay
@@ -108,7 +165,10 @@ onBeforeUnmount(() => {
             preload="metadata"
             aria-hidden="true"
             tabindex="-1"
-            @playing="videoReady = true"
+            @canplay="handleCanPlay"
+            @playing="handlePlaying"
+            @pause="handlePause"
+            @error="handleError"
         >
             <source
                 v-for="source in videoSources"
@@ -117,6 +177,19 @@ onBeforeUnmount(() => {
                 :type="source.type"
             />
         </video>
+
+        <button
+            v-if="videoReady"
+            type="button"
+            class="absolute right-4 bottom-4 z-10 inline-flex size-10 items-center justify-center rounded-full border border-white/25 bg-ink-950/55 text-white backdrop-blur-sm transition-colors duration-150 hover:bg-ink-950/75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-500 sm:right-6 sm:bottom-6"
+            :aria-label="
+                isPaused ? 'Reproducir video de fondo' : 'Pausar video de fondo'
+            "
+            @click="toggleVideo"
+        >
+            <Play v-if="isPaused" class="size-4" aria-hidden="true" />
+            <Pause v-else class="size-4" aria-hidden="true" />
+        </button>
 
         <div
             class="absolute inset-0 -z-10 bg-gradient-to-t from-ink-950/80 via-ink-950/40 to-ink-950/20 lg:bg-gradient-to-r lg:from-ink-950/75 lg:via-ink-950/25 lg:to-transparent"
