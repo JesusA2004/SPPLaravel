@@ -125,6 +125,8 @@ return [
         ['name' => 'Floramundo', 'logo' => '/images/clientes/floramundo.webp', 'width' => 360, 'height' => 350],
         ['name' => 'Doster, Fundación para la protección del ambiente', 'logo' => '/images/clientes/doster.webp', 'width' => 480, 'height' => 334],
         ['name' => 'Invest Pro', 'logo' => '/images/clientes/invest.webp', 'width' => 480, 'height' => 266],
+        ['name' => 'BYD', 'logo' => '/images/clientes/byd.webp', 'width' => 780, 'height' => 245],
+        ['name' => 'ECCACIV, S.A. de C.V.', 'logo' => '/images/clientes/eccaciv.webp', 'width' => 956, 'height' => 588],
     ],
 
     /*

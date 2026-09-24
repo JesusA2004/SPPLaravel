@@ -10,7 +10,7 @@ test('la página de inicio responde con todas sus secciones', function () {
             ->has('philosophy.mission', 2)
             ->has('philosophy.vision', 2)
             ->has('philosophy.values', 7)
-            ->has('clients', 8)
+            ->has('clients', 10)
             ->has('services', 4)
             ->where('company.contact.phone.label', '777 102 26 76')
             ->where('company.contact.email', 'spp.segpriv@gmail.com')

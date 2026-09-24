@@ -32,7 +32,7 @@ test('la página de inicio tiene título, descripción y metadatos sociales', fu
         ->assertSee('<title data-inertia="">SPP Seguridad Privada en Cuernavaca, Morelos | Servicios de Protección Profesional</title>', false)
         ->assertSee('name="description" content="SPP, empresa de seguridad privada en Cuernavaca, Morelos', false)
         ->assertSee('<link data-inertia="canonical" rel="canonical" href="https://seguridadprivadaspp.com/">', false)
-        ->assertSee('property="og:image" content="https://seguridadprivadaspp.com/images/marca/og-image.jpg"', false)
+        ->assertSee('property="og:image" content="https://seguridadprivadaspp.com/images/marca/spp-social-2026.jpg"', false)
         ->assertSee('property="og:image:width" content="1200"', false)
         ->assertSee('property="og:image:height" content="630"', false)
         ->assertSee('name="twitter:card" content="summary_large_image"', false)
@@ -112,8 +112,8 @@ test('si APP_URL quedó en localhost se usa el dominio real de la visita', funct
 
     $response
         ->assertSee('rel="canonical" href="https://seguridadprivadaspp.com/"', false)
-        ->assertSee('property="og:image" content="https://seguridadprivadaspp.com/images/marca/og-image.jpg"', false)
-        ->assertSee('name="twitter:image" content="https://seguridadprivadaspp.com/images/marca/og-image.jpg"', false)
+        ->assertSee('property="og:image" content="https://seguridadprivadaspp.com/images/marca/spp-social-2026.jpg"', false)
+        ->assertSee('name="twitter:image" content="https://seguridadprivadaspp.com/images/marca/spp-social-2026.jpg"', false)
         ->assertDontSee('localhost:8000', false);
 
     $this->get($requestUrl.'robots.txt')

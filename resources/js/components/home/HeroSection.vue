@@ -105,7 +105,7 @@ onBeforeUnmount(() => {
             loop
             playsinline
             disablepictureinpicture
-            preload="auto"
+            preload="metadata"
             aria-hidden="true"
             tabindex="-1"
             @playing="videoReady = true"
@@ -119,11 +119,11 @@ onBeforeUnmount(() => {
         </video>
 
         <div
-            class="absolute inset-0 -z-10 bg-gradient-to-t from-ink-950/90 via-ink-950/55 to-ink-950/35 lg:bg-gradient-to-r lg:from-ink-950/85 lg:via-ink-950/35 lg:to-transparent"
+            class="absolute inset-0 -z-10 bg-gradient-to-t from-ink-950/80 via-ink-950/40 to-ink-950/20 lg:bg-gradient-to-r lg:from-ink-950/75 lg:via-ink-950/25 lg:to-transparent"
             aria-hidden="true"
         />
         <div
-            class="absolute inset-x-0 bottom-0 -z-10 h-24 bg-gradient-to-t from-ink-950/80 to-transparent"
+            class="absolute inset-x-0 bottom-0 -z-10 h-24 bg-gradient-to-t from-ink-950/65 to-transparent"
             aria-hidden="true"
         />
 
