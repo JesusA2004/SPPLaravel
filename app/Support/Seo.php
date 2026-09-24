@@ -8,7 +8,7 @@ namespace App\Support;
  */
 class Seo
 {
-    private const OG_IMAGE = '/images/marca/spp-social-2026.jpg';
+    private const OG_IMAGE = '/images/marca/spp-social-2026-v2.jpg';
 
     private const OG_IMAGE_WIDTH = 1200;
 
