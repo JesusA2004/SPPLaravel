@@ -36,6 +36,7 @@ test('la página de inicio tiene título, descripción y metadatos sociales', fu
         ->assertSee('property="og:image:width" content="1200"', false)
         ->assertSee('property="og:image:height" content="630"', false)
         ->assertSee('name="twitter:card" content="summary_large_image"', false)
+        ->assertSee('property="og:description" content="SPP, empresa de seguridad privada en Cuernavaca, Morelos, con más de 20 años de experiencia. Guardias intramuros, escoltas, CCTV y cercas eléctricas. Cotiza sin compromiso al 777 102 26 76 o por WhatsApp."', false)
         ->assertSee('name="robots" content="index, follow, max-image-preview:large"', false);
 });
 

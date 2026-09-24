@@ -21,7 +21,7 @@ defineProps<{
         <meta
             head-key="og:description"
             property="og:description"
-            :content="seo.description"
+            :content="seo.socialDescription"
         />
         <meta head-key="og:url" property="og:url" :content="seo.canonical" />
         <meta head-key="og:image" property="og:image" :content="seo.image" />
@@ -53,7 +53,7 @@ defineProps<{
         <meta
             head-key="twitter:description"
             name="twitter:description"
-            :content="seo.description"
+            :content="seo.socialDescription"
         />
         <meta
             head-key="twitter:image"

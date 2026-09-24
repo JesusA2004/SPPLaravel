@@ -17,7 +17,7 @@ class Seo
     /**
      * @param  list<array{name: string, url: string}>  $breadcrumbs  Migas después de "Inicio".
      * @param  array<string, mixed>|null  $service  Servicio del catálogo para su esquema Service.
-     * @return array{title: string, description: string, canonical: string, image: string, imageWidth: int, imageHeight: int, imageAlt: string, type: string, robots: string, schema: array<string, mixed>}
+     * @return array{title: string, description: string, socialDescription: string, canonical: string, image: string, imageWidth: int, imageHeight: int, imageAlt: string, type: string, robots: string, schema: array<string, mixed>}
      */
     public static function make(
         string $title,
@@ -32,6 +32,7 @@ class Seo
         return [
             'title' => $title,
             'description' => $description,
+            'socialDescription' => $description.' Cotiza sin compromiso al '.config('spp.contact.phone.label').' o por WhatsApp.',
             'canonical' => $canonical,
             'image' => self::absoluteUrl($image ?? self::OG_IMAGE),
             'imageWidth' => self::OG_IMAGE_WIDTH,
@@ -109,6 +110,7 @@ class Seo
             'url' => $canonical,
             'name' => $title,
             'description' => $description,
+            'socialDescription' => $description.' Cotiza sin compromiso al '.config('spp.contact.phone.label').' o por WhatsApp.',
             'inLanguage' => 'es-MX',
             'isPartOf' => ['@id' => $home.'#sitio'],
             'about' => ['@id' => $organizationId],

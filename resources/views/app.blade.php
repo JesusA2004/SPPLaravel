@@ -16,7 +16,7 @@
             <link data-inertia="canonical" rel="canonical" href="{{ $seo['canonical'] }}">
             <meta data-inertia="og:type" property="og:type" content="{{ $seo['type'] }}">
             <meta data-inertia="og:title" property="og:title" content="{{ $seo['title'] }}">
-            <meta data-inertia="og:description" property="og:description" content="{{ $seo['description'] }}">
+            <meta data-inertia="og:description" property="og:description" content="{{ $seo['socialDescription'] }}">
             <meta data-inertia="og:url" property="og:url" content="{{ $seo['canonical'] }}">
             <meta data-inertia="og:image" property="og:image" content="{{ $seo['image'] }}">
             <meta data-inertia="og:image:width" property="og:image:width" content="{{ $seo['imageWidth'] }}">
@@ -24,7 +24,7 @@
             <meta data-inertia="og:image:alt" property="og:image:alt" content="{{ $seo['imageAlt'] }}">
             <meta data-inertia="twitter:card" name="twitter:card" content="summary_large_image">
             <meta data-inertia="twitter:title" name="twitter:title" content="{{ $seo['title'] }}">
-            <meta data-inertia="twitter:description" name="twitter:description" content="{{ $seo['description'] }}">
+            <meta data-inertia="twitter:description" name="twitter:description" content="{{ $seo['socialDescription'] }}">
             <meta data-inertia="twitter:image" name="twitter:image" content="{{ $seo['image'] }}">
             <script type="application/ld+json">{!! json_encode($seo['schema'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
         @else

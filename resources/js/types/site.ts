@@ -8,6 +8,7 @@ export type ImageAsset = {
 export type Seo = {
     title: string;
     description: string;
+    socialDescription: string;
     canonical: string;
     image: string;
     imageWidth: number;
